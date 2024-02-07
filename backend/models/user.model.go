@@ -9,4 +9,6 @@ type User struct {
 	FirstName        string               `json:"firstName,omitempty" validate:"required"`
 	LastName         string               `json:"lastName,omitempty" validate:"required"`
 	FavHairCompanies []primitive.ObjectID `json:"favHairCompanies,omitempty"`
+	Age              int                  `json:"age,omitempty" validate:"required"`
+	Gender           string               `json:"gender,omitempty" validate:"required"`
 }
