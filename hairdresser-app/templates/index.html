@@ -1,0 +1,51 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Sign in/up Form</h2>
+<div class="container" id="container">
+    <div class="form-container sign-up-container">
+        <form action="/user" method="post">
+            <h1>Create Account</h1>
+            <select name="gender">
+                <option value="" disabled selected>Gender...</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+            <input type="text" placeholder="First Name" name="firstName" required/>
+            <input type="text" placeholder="Last Name" name="lastName" required/>
+            <input type="number" placeholder="Age" name="age" min="0" max="100" required/>
+            <input type="email" placeholder="Email" name="email" required/>
+            <input type="password" placeholder="Password" name="password" required/>
+            <button type="submit">Sign Up</button>
+        </form>
+        
+    </div>
+    <div class="form-container sign-in-container">
+        <form action="/login" method="post">
+            <h1>Sign in</h1>
+            <div class="social-container">
+                <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <span>or use your account</span>
+            <input type="email" placeholder="Email" name="username" required/>
+            <input type="password" placeholder="Password" name="password" required/>
+            <a href="#">Forgot your password?</a>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h1>Welcome Back!</h1>
+                <p>To keep connected with us please login with your personal info</p>
+                <button class="ghost" id="signIn">Sign In</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+                <h1>Hello, Friend!</h1>
+                <p>Enter your personal details and start journey with us</p>
+                <button class="ghost" id="signUp">Sign Up</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{ template "footer.html" .}}
