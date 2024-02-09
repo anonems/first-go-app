@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"hairdresser-app/configs"
 	"hairdresser-app/constants"
 	"hairdresser-app/models"
 	"hairdresser-app/responses"
@@ -16,10 +15,7 @@ import (
 	//"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-var hairCompanyCollection *mongo.Collection = configs.GetCollection(configs.DB, "hairCompanies")
 
 //var validate = validator.New()
 
@@ -42,7 +38,6 @@ func CreateHairCompany() gin.HandlerFunc {
 		}
 
 		newHairCompany := models.HairCompany{
-			Email:   hairCompany.Email,
 			Name:    hairCompany.Name,
 			SIREN:   hairCompany.SIREN,
 			Status:  constants.OPPENED,

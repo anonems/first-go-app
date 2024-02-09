@@ -1,11 +1,13 @@
 package models
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type HairCompany struct {
-	Email   string             `json:"email,omitempty" validate:"required"`
+	ID      primitive.ObjectID `bson:"_id"`
 	Name    string             `json:"name,omitempty" validate:"required"`
 	SIREN   string             `json:"siren,omitempty" validate:"required"`
 	Address Address            `json:"address,omitempty" validate:"required"`
-	Status  string             `json:"status,omitempty" Validate:"required"` //status can be oppened or closed 
+	Status  string             `json:"status,omitempty" Validate:"required"` //status can be oppened or closed
 }
 
 type Address struct {

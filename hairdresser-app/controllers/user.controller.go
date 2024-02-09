@@ -3,22 +3,16 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"hairdresser-app/configs"
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"hairdresser-app/models"
 	"hairdresser-app/responses"
 	"hairdresser-app/utils"
 	"net/http"
-	"time"
 	"strconv"
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
-
-var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
-var validate = validator.New()
 
 func CreateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -34,6 +28,15 @@ func CreateUser() gin.HandlerFunc {
 			Age:       age,
 			Gender:    c.Request.PostFormValue("gender"),
 		}
+		// filter := bson.D{{"email", user.Email}}
+		// var checkEmail []models.User
+		// cursor, _ := userCollection.Find(context.TODO(), filter)
+		// cursor.All(context.TODO(), &checkEmail)
+		// if len(checkEmail) > 0 {
+		// 	c.JSON(http.StatusNotAcceptable, responses.DefaultResponse{Status: http.StatusInternalServerError})
+		// 	return
+		// }
+
 		//validate the request body
 		if err := c.BindQuery(&user); err != nil {
 			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
@@ -92,30 +95,43 @@ func EditUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		userId := c.Param("userId")
-		var user models.User
 		defer cancel()
+
+		age, _ := strconv.Atoi(c.Request.PostFormValue("age"))
+		user := models.User{
+			Email:     c.Request.PostFormValue("email"),
+			Password:  c.Request.PostFormValue("password"),
+			FirstName: c.Request.PostFormValue("firstName"),
+			LastName:  c.Request.PostFormValue("lastName"),
+			Age:       age,
+			Gender:    c.Request.PostFormValue("gender"),
+		} 
 		objId, _ := primitive.ObjectIDFromHex(userId)
+		// filter := bson.D{{"email", user.Email}}
+		// var checkEmail []models.User
+		// cursor, _ := userCollection.Find(context.TODO(), filter)
+		// cursor.All(context.TODO(), &checkEmail)
+		// if len(checkEmail) > 0 {
+		// 	c.JSON(http.StatusNotAcceptable, responses.DefaultResponse{Status: http.StatusInternalServerError})
+		// 	return
+		// }
+		// fmt.Println(objId)
 
 		//validate the request body
-		if err := c.BindJSON(&user); err != nil {
+		if err := c.BindQuery(&user); err != nil {
 			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
-			return
-		}
-
-		//use the validator library to validate required fields
-		if validationErr := validate.Struct(&user); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
 			return
 		}
 
 		update := bson.M{
 			"email":     user.Email,
-			"password":  user.Password,
+			//"password":  user.Password,
 			"firstName": user.FirstName,
 			"lastName":  user.LastName,
 			"age":       user.Age,
-			"gender":    user.Gender}
-		result, err := userCollection.UpdateOne(ctx, bson.M{"id": objId}, bson.M{"$set": update})
+			"gender":    user.Gender,
+		}
+		result, err := userCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": update})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.DefaultResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 			return
@@ -124,13 +140,24 @@ func EditUser() gin.HandlerFunc {
 		//get updated user details
 		var updatedUser models.User
 		if result.MatchedCount == 1 {
-			err := userCollection.FindOne(ctx, bson.M{"id": objId}).Decode(&updatedUser)
+			err := userCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&updatedUser)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, responses.DefaultResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
 				return
 			}
 		}
 
-		c.JSON(http.StatusOK, responses.DefaultResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": updatedUser}})
+		c.HTML(http.StatusOK, "myProfile.html", gin.H{
+			"title":          "My Profile",
+			"userId":         updatedUser.ID,
+			"firstName":      updatedUser.FirstName,
+			"lastName":       updatedUser.LastName,
+			"age":            updatedUser.Age,
+			"email":          updatedUser.Email,
+			"gender":         updatedUser.Gender,
+			"successMessage": "Your profile has been updated!",
+		})
+
+		//c.JSON(http.StatusOK, responses.DefaultResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": updatedUser}})
 	}
 }

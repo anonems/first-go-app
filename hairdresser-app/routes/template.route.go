@@ -9,6 +9,8 @@ func TemplateRoute(router *gin.Engine) {
 
 	//user page
 	router.GET("/", controllers.HomePage())
-	router.GET("/list", controllers.HairCompaniesPage())
+	router.GET("/menu", controllers.MainMenu())
+	router.GET("/myProfile", controllers.MyProfile())
+	router.GET("/myCompany", controllers.MyCompany())
 
 }

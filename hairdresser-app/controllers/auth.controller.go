@@ -53,7 +53,6 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-
 		if !utils.CheckPasswordHash(login.Password, user.Password) {
 			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": "invalid credential!"}})
 			return
@@ -64,8 +63,10 @@ func Login() gin.HandlerFunc {
 		session.Values["user"] = user
 		session.Save(c.Request, c.Writer)
 
+		c.Redirect(http.StatusFound, "/")
 
-		c.JSON(http.StatusOK, responses.DefaultResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": user}})
+
+		//c.JSON(http.StatusOK, responses.DefaultResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": user}})
 
 	}
 }
@@ -86,7 +87,7 @@ func auth(c *gin.Context) {
 	fmt.Println("session:", session)
 	_, ok := session.Values["user"]
 	if !ok {
-		c.HTML(http.StatusForbidden, "index.html", nil)
+		c.HTML(http.StatusBadRequest, "index.html", nil)
 		c.Abort()
 		return
 	}

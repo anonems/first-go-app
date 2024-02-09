@@ -13,6 +13,6 @@ func UserRoute(router *gin.Engine) {
 
 	//user action
 	router.POST("/user", controllers.CreateUser())
-	router.PUT("/user/:userId", controllers.EditUser())
+	router.POST("/user/edit/:userId", controllers.EditUser())
 
 }

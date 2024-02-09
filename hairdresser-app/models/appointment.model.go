@@ -3,6 +3,7 @@ package models
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Appointment struct {
+	ID             primitive.ObjectID `bson:"_id"`
 	HairCompanyId  primitive.ObjectID `json:"hairCompanyId,omitempty" validate:"required"`
 	Status         string             `json:"status,omitempty" validate:"required"` //status can be available, reserved, expired or cancelled,
 	Time           string             `json:"time,omitempty" validate:"required"`
