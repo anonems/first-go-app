@@ -1,10 +1,12 @@
 {{ template "header.html" .}}
 <h2>Hairdresser App: My Profile</h2>
+<h3><a href="/">Bact to home</a></h3>
 <div class="container" id="container"
     style="  display: flex; justify-content: center; align-items: center; text-align: center;">
     <form action="/user/edit/{{ .userId }}" method="post">
         <h1>Update My Profile</h1>
         <span style="color:green">{{ .successMessage }}</span>
+        <span style="color:red">{{ .errorMessage }}</span>
         <select name="gender">
             <option value="{{ .gender }}" selected>Gender...</option>
             <option value="male">Male</option>
@@ -14,7 +16,7 @@
         <input type="text" placeholder="Update Last Name" name="lastName" value="{{ .lastName }}"/>
         <input type="number" placeholder="Update Age" name="age" min="0" max="100" value="{{ .age }}"/>
         <input type="email" placeholder="Update Email" name="email" value="{{ .email }}"/>
-        <button type="submit">Sign Up</button>
+        <button type="submit">Submit</button>
     </form>
 </div>
 {{ template "footer.html" .}}

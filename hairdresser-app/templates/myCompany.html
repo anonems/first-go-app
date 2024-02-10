@@ -1,17 +1,20 @@
 {{ template "header.html" .}}
 <h2>Hairdresser App: My Profile</h2>
+<h3><a href="/">Bact to home</a></h3>
 <div class="container" id="container"
     style="  display: flex; justify-content: center; align-items: center; text-align: center;">
-    <form action="/hairCompany" method="post">
+    <form action="{{ .rootUrl }}" method="post">
         <h1>{{ .formTitle }}</h1>
+        <span style="color:green">{{ .successMessage }}</span>
+        <span style="color:red">{{ .errorMessage }}</span>
         <input type="text" placeholder="Company Name" name="name" value="{{ .name }}" required/>
         <input type="text" placeholder="SIREN" name="siren" minlength="9" maxlength="9" value="{{ .siren }}" required/>
-        <input type="text" placeholder="Address : Line 1" value="{{ .line1 }}" required/>
-        <input type="text" placeholder="Address : Line 2" value="{{ .line2 }}"/>
-        <input type="text" placeholder="Address : Postale Code" minlength="5" maxlength="5" value="{{ .postalCode }}" required/>
-        <input type="text" placeholder="Address : City" value="{{ .city }}" required/>
-        <input type="text" placeholder="Address : Country" value="{{ .country }}" required/>
-        <button type="submit">Sign Up</button>
+        <input type="text" placeholder="Address : Line 1" name="line1" value="{{ .line1 }}" required/>
+        <input type="text" placeholder="Address : Line 2" name="line2" value="{{ .line2 }}"/>
+        <input type="text" placeholder="Address : Postal Code" name="postalCode" minlength="5" maxlength="5" value="{{ .postalCode }}" required/>
+        <input type="text" placeholder="Address : City" name="city" value="{{ .city }}" required/>
+        <input type="text" placeholder="Address : Country" name="country" value="{{ .country }}" required/>
+        <button type="submit">Submit</button>
     </form>
 </div>
 {{ template "footer.html" .}}

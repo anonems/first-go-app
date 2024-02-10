@@ -3,16 +3,13 @@ package controllers
 import (
 	"context"
 	"encoding/gob"
-	"fmt"
-	"hairdresser-app/models"
-	"hairdresser-app/responses"
-	"hairdresser-app/utils"
-	"net/http"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"go.mongodb.org/mongo-driver/bson"
+	"hairdresser-app/models"
+	"hairdresser-app/utils"
+	"net/http"
+	"time"
 )
 
 var store = sessions.NewCookieStore([]byte("super"))
@@ -30,67 +27,60 @@ func Login() gin.HandlerFunc {
 		defer cancel()
 
 		login := models.Login{
-			Username : c.Request.PostFormValue("username"),
-			Password : c.Request.PostFormValue("password"),
+			Username: c.Request.PostFormValue("username"),
+			Password: c.Request.PostFormValue("password"),
 		}
-
 
 		//validate the request body
 		if err := c.BindQuery(&login); err != nil {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.HTML(http.StatusBadRequest, "index.html", gin.H{
+				"title":        "Signin / Signup",
+				"errorMessage": err.Error(),
+			})
 			return
 		}
 
 		//use the validator library to validate required fields
 		if validationErr := validate.Struct(&login); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+			c.HTML(http.StatusBadRequest, "index.html", gin.H{
+				"title":        "Signin / Signup",
+				"errorMessage": validationErr.Error(),
+			})
 			return
 		}
 
 		err := userCollection.FindOne(ctx, bson.M{"email": login.Username}).Decode(&user)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.DefaultResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.HTML(http.StatusBadRequest, "index.html", gin.H{
+				"title":        "Signin / Signup",
+				"errorMessage": err.Error(),
+			})
 			return
 		}
 
-		if !utils.CheckPasswordHash(login.Password, user.Password) {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": "invalid credential!"}})
+		if utils.CheckPasswordHash(login.Password, user.Password) {
+			//configure session
+			session, _ := store.Get(c.Request, "session")
+			session.Values["user"] = user
+			session.Save(c.Request, c.Writer)
+
+			c.Redirect(http.StatusFound, "/")
+		} else {
+			c.HTML(http.StatusBadRequest, "index.html", gin.H{
+				"title":        "Signin / Signup",
+				"errorMessage": "Invalid password / username",
+			})
 			return
 		}
-
-		//configure session
-		session, _ := store.Get(c.Request, "session")
-		session.Values["user"] = user
-		session.Save(c.Request, c.Writer)
-
-		c.Redirect(http.StatusFound, "/")
-
-
-		//c.JSON(http.StatusOK, responses.DefaultResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": user}})
 
 	}
 }
 
-
-// func Logout(c *gin.Context) {
-// 	session := sessions.Default(c)
-// 	session.Clear()
-// 	session.Save()
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"message": "User Sign out successfully",
-// 	})
-// }
-
-func auth(c *gin.Context) {
-	fmt.Println("auth func runnig")
-	session, _ := store.Get(c.Request, "session")
-	fmt.Println("session:", session)
-	_, ok := session.Values["user"]
-	if !ok {
-		c.HTML(http.StatusBadRequest, "index.html", nil)
-		c.Abort()
-		return
+func Logout() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		session, _ := store.Get(c.Request, "session")
+		delete(session.Values, "user")
+		session.Save(c.Request, c.Writer)
+		c.Redirect(http.StatusFound, "/")
 	}
-	fmt.Println("func done")
-	c.Next()
 }

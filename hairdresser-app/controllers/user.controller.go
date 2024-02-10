@@ -119,7 +119,9 @@ func EditUser() gin.HandlerFunc {
 
 		//validate the request body
 		if err := c.BindQuery(&user); err != nil {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.HTML(http.StatusBadRequest, "myUser.html", gin.H{
+				"errorMessage": err.Error(),
+			})
 			return
 		}
 
@@ -133,7 +135,9 @@ func EditUser() gin.HandlerFunc {
 		}
 		result, err := userCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": update})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.DefaultResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.HTML(http.StatusBadRequest, "myUser.html", gin.H{
+				"errorMessage": err.Error(),
+			})
 			return
 		}
 
@@ -142,7 +146,9 @@ func EditUser() gin.HandlerFunc {
 		if result.MatchedCount == 1 {
 			err := userCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&updatedUser)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, responses.DefaultResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+				c.HTML(http.StatusBadRequest, "myUser.html", gin.H{
+					"errorMessage": err.Error(),
+				})
 				return
 			}
 		}
@@ -158,6 +164,5 @@ func EditUser() gin.HandlerFunc {
 			"successMessage": "Your profile has been updated!",
 		})
 
-		//c.JSON(http.StatusOK, responses.DefaultResponse{Status: http.StatusOK, Message: "success", Data: map[string]interface{}{"data": updatedUser}})
 	}
 }

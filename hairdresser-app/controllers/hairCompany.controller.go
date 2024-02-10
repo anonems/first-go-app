@@ -22,18 +22,35 @@ import (
 func CreateHairCompany() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var hairCompany models.HairCompany
 		defer cancel()
+		address:= models.Address{
+			Line1:      c.Request.PostFormValue("line1"),
+			Line2:      c.Request.PostFormValue("line2"),
+			PostalCode: c.Request.PostFormValue("postalCode"),
+			City:       c.Request.PostFormValue("city"),
+			Country:    c.Request.PostFormValue("country"),
+		}
+
+		hairCompany := models.HairCompany{
+			Name:  c.Request.PostFormValue("name"),
+			SIREN: c.Request.PostFormValue("siren"),
+			Address: address,
+		}
 
 		//validate the request body
-		if err := c.BindJSON(&hairCompany); err != nil {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+		if err := c.BindQuery(&hairCompany); err != nil {
+			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"errorMessage": err.Error(),
+			})
 			return
 		}
 
 		//use the validator library to validate required fields
 		if validationErr := validate.Struct(&hairCompany); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"title":      "My Company",
+				"errorMessage": validationErr.Error(),
+			})
 			return
 		}
 
@@ -44,20 +61,47 @@ func CreateHairCompany() gin.HandlerFunc {
 			Address: hairCompany.Address,
 		}
 
-		result, err := hairCompanyCollection.InsertOne(ctx, newHairCompany)
+		_, err := hairCompanyCollection.InsertOne(ctx, newHairCompany)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.DefaultResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"title":      "My Company",
+				"errorMessage": err.Error(),
+			})
 			return
 		}
 
-		// newUserHairCompany := models.UserHairCompany{
-		// 	Id:            primitive.NewObjectID(),
-		// 	UserId:        result.InsertedID,
-		// 	HairCompanyId: primitive.ObjectID{result.InsertedID},
-		// 	Type:          constants.OWNER,
-		// }
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		user, _= val.(*models.User)
+		newUserHairCompany := models.UserHairCompany{
+			HairCompanyId: newHairCompany.ID,
+			UserId: user.ID,
+			Type: constants.OWNER,
+		}
+		_, err2 := userHairCompanyCollection.InsertOne(ctx, newUserHairCompany)
+		if err2 != nil {
+			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"title":      "My Company",
+				"errorMessage": err2.Error(),
+			})
+			return
+		}
 
-		c.JSON(http.StatusCreated, responses.DefaultResponse{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": result}})
+		c.HTML(http.StatusOK, "myCompany.html", gin.H{
+			"title":      "My Company",
+			"rootUrl":    "/hairCompany/" + hairCompany.ID.Hex(),
+			"formTitle":  "Update Company",
+			"name":       hairCompany.Name,
+			"siren":      hairCompany.SIREN,
+			"line1":      hairCompany.Address.Line1,
+			"line2":      hairCompany.Address.Line2,
+			"postalCode": hairCompany.Address.PostalCode,
+			"city":       hairCompany.Address.City,
+			"country":    hairCompany.Address.Country,
+			"successMessage": "Your company has been created!",
+		})
+
 	}
 }
 
