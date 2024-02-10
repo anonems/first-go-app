@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"hairdresser-app/models"
+
 	//"hairdresser-app/responses"
 	"net/http"
 	"time"
@@ -31,17 +32,19 @@ func HomePage() gin.HandlerFunc {
 			defer cancel()
 
 			adminAction := "Manage My Company"
+			hidden := ""
 
 			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
 
 			if err != nil {
 				adminAction = "Create Company"
-
+				hidden = "hidden"
 			}
 
-			c.HTML(http.StatusForbidden, "menu.html", gin.H{
+			c.HTML(http.StatusForbidden, "mainMenu.html", gin.H{
 				"title":       "Main Menu",
 				"adminAction": adminAction,
+				"hidden":      hidden,
 			})
 		}
 
@@ -77,7 +80,7 @@ func MainMenu() gin.HandlerFunc {
 		if user, ok = val.(*models.User); !ok {
 			c.Redirect(http.StatusForbidden, "/")
 		} else {
-			c.HTML(http.StatusOK, "menu.html", gin.H{
+			c.HTML(http.StatusOK, "mainMenu.html", gin.H{
 				"title": "Main Menu",
 			})
 		}
@@ -137,16 +140,87 @@ func MyCompany() gin.HandlerFunc {
 			}
 			hairCompanyCollection.FindOne(ctx, bson.M{"_id": userHairCompany.HairCompanyId}).Decode(&hairCompany)
 			c.HTML(http.StatusOK, "myCompany.html", gin.H{
-				"title":         "My Company",
-				"rootUrl":       rootUrl,
-				"formTitle":     formTitle,
-				"name":          hairCompany.Name,
-				"siren":         hairCompany.SIREN,
-				"line1":         hairCompany.Address.Line1,
-				"line2":         hairCompany.Address.Line2,
-				"postalCode":    hairCompany.Address.PostalCode,
-				"city":          hairCompany.Address.City,
-				"country":       hairCompany.Address.Country,
+				"title":      "My Company",
+				"rootUrl":    rootUrl,
+				"formTitle":  formTitle,
+				"name":       hairCompany.Name,
+				"siren":      hairCompany.SIREN,
+				"line1":      hairCompany.Address.Line1,
+				"line2":      hairCompany.Address.Line2,
+				"postalCode": hairCompany.Address.PostalCode,
+				"city":       hairCompany.Address.City,
+				"country":    hairCompany.Address.Country,
+			})
+		}
+	}
+}
+
+func MyAppointments() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			var hairCompany models.HairCompany
+			var userHairCompany models.UserHairCompany
+			defer cancel()
+
+			formTitle := "Update Company"
+
+			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
+			rootUrl := "/hairCompany/edit/" + userHairCompany.ID.Hex()
+			if err != nil {
+				formTitle = "Create Company"
+				rootUrl = "/hairCompany"
+
+			}
+			hairCompanyCollection.FindOne(ctx, bson.M{"_id": userHairCompany.HairCompanyId}).Decode(&hairCompany)
+			c.HTML(http.StatusOK, "myCompany.html", gin.H{
+				"title":      "My Company",
+				"rootUrl":    rootUrl,
+				"formTitle":  formTitle,
+				"name":       hairCompany.Name,
+				"siren":      hairCompany.SIREN,
+				"line1":      hairCompany.Address.Line1,
+				"line2":      hairCompany.Address.Line2,
+				"postalCode": hairCompany.Address.PostalCode,
+				"city":       hairCompany.Address.City,
+				"country":    hairCompany.Address.Country,
+			})
+		}
+	}
+}
+
+func AdminMenu() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			var hairCompany models.HairCompany
+			var userHairCompany models.UserHairCompany
+			defer cancel()
+
+			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
+			if err != nil {
+				c.Redirect(http.StatusFound, "/myCompany")
+
+			}
+			hairCompanyCollection.FindOne(ctx, bson.M{"_id": userHairCompany.HairCompanyId}).Decode(&hairCompany)
+			c.HTML(http.StatusOK, "adminMenu.html", gin.H{
+				"title": "Admin Portal",
 			})
 		}
 	}

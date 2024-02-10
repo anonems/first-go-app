@@ -5,8 +5,10 @@
     <div style="display: grid; gap: 10px;">
         <div style="grid-row: 1;"><form action="/"><button>Take Appointment</button></form></div>
         <div style="grid-row: 2;"><form action="/myProfile"><button>Manage My Profile</button></form></div>
-        <div style="grid-row: 3;"><form action="/myCompany"><button>{{ .adminAction }}</button></form></div>
-        <div style="grid-row: 4;"><form action="/logout"><button>Logout</button></form></div>
+        <div style="grid-row: 3;"><form action="/myAppointments"><button>Manage my Appointments</button></form></div>
+        <div style="grid-row: 4;"><form action="/myCompany"><button>{{ .adminAction }}</button></form></div>
+        <div style="grid-row: 5;" {{ .hidden }}><form action="/adminMenu"><button>Admin Portal</button></form></div>
+        <div style="grid-row: 6;"><form action="/logout"><button>Logout</button></form></div>
     </div>
 </div>
 {{ template "footer.html" .}}

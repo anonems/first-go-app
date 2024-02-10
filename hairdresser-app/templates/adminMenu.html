@@ -1,0 +1,12 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Admin Portal</h2>
+<h3><a href="/">Back to home</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+    <div style="display: grid; gap: 10px;">
+        <div style="grid-row: 1;"><form action="/"><button>Manage Appointment Types</button></form></div>
+        <div style="grid-row: 2;"><form action="/"><button>Manage Special offers</button></form></div>
+        <div style="grid-row: 3;"><form action="/"><button>Manage Appointments</button></form></div>
+    </div>
+</div>
+{{ template "footer.html" .}}
