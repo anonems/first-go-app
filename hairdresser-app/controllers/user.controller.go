@@ -28,24 +28,22 @@ func CreateUser() gin.HandlerFunc {
 			Age:       age,
 			Gender:    c.Request.PostFormValue("gender"),
 		}
-		// filter := bson.D{{"email", user.Email}}
-		// var checkEmail []models.User
-		// cursor, _ := userCollection.Find(context.TODO(), filter)
-		// cursor.All(context.TODO(), &checkEmail)
-		// if len(checkEmail) > 0 {
-		// 	c.JSON(http.StatusNotAcceptable, responses.DefaultResponse{Status: http.StatusInternalServerError})
-		// 	return
-		// }
 
 		//validate the request body
 		if err := c.BindQuery(&user); err != nil {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.HTML(http.StatusBadRequest, "index.html", gin.H{
+				"title":        "Signin / Signup",
+				"errorMessage": err.Error(),
+			})
 			return
 		}
 
 		//use the validator library to validate required fields
 		if validationErr := validate.Struct(&user); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.DefaultResponse{Status: http.StatusBadRequest, Message: "error", Data: map[string]interface{}{"data": validationErr.Error()}})
+			c.HTML(http.StatusBadRequest, "index.html", gin.H{
+				"title":        "Signin / Signup",
+				"errorMessage": validationErr.Error(),
+			})
 			return
 		}
 
@@ -60,13 +58,17 @@ func CreateUser() gin.HandlerFunc {
 			Gender:    user.Gender,
 		}
 
-		result, err := userCollection.InsertOne(ctx, newUser)
+		_, err := userCollection.InsertOne(ctx, newUser)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.DefaultResponse{Status: http.StatusInternalServerError, Message: "error", Data: map[string]interface{}{"data": err.Error()}})
+			c.HTML(http.StatusBadRequest, "index.html", gin.H{
+				"title":        "Signin / Signup",
+				"errorMessage": err.Error(),
+			})
 			return
 		}
 
-		c.JSON(http.StatusCreated, responses.DefaultResponse{Status: http.StatusCreated, Message: "success", Data: map[string]interface{}{"data": result}})
+		c.Redirect(http.StatusFound, "/")
+
 	}
 }
 
@@ -105,7 +107,7 @@ func EditUser() gin.HandlerFunc {
 			LastName:  c.Request.PostFormValue("lastName"),
 			Age:       age,
 			Gender:    c.Request.PostFormValue("gender"),
-		} 
+		}
 		objId, _ := primitive.ObjectIDFromHex(userId)
 		// filter := bson.D{{"email", user.Email}}
 		// var checkEmail []models.User
@@ -126,7 +128,7 @@ func EditUser() gin.HandlerFunc {
 		}
 
 		update := bson.M{
-			"email":     user.Email,
+			"email": user.Email,
 			//"password":  user.Password,
 			"firstName": user.FirstName,
 			"lastName":  user.LastName,

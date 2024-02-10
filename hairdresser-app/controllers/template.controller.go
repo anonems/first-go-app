@@ -128,15 +128,15 @@ func MyCompany() gin.HandlerFunc {
 
 			formTitle := "Update Company"
 
-			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
+			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID.Hex()}).Decode(&userHairCompany)
 			rootUrl := "/hairCompany/edit/" + userHairCompany.ID.Hex()
 			if err != nil {
 				formTitle = "Create Company"
 				rootUrl = "/hairCompany"
 
 			}
-			hairCompanyCollection.FindOne(ctx, bson.M{"_id": userHairCompany.HairCompanyId}).Decode(&hairCompany)
-
+			hairCompanyCollection.FindOne(ctx, bson.M{"_id": userHairCompany.HairCompanyId.Hex()}).Decode(&hairCompany)
+fmt.Println(userHairCompany.HairCompanyId.Hex(), user.ID.Hex())
 			c.HTML(http.StatusOK, "myCompany.html", gin.H{
 				"title":         "My Company",
 				"rootUrl":       rootUrl,
