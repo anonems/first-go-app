@@ -23,6 +23,7 @@ func main() {
 	routes.AuthRoute(router)
 	routes.UserRoute(router)
 	routes.HairCompanyRoute(router)
+	routes.AppointmentTypeRoute(router)
 
 	router.Run(":5000")
 }

@@ -11,6 +11,6 @@ import (
 var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
 var userHairCompanyCollection *mongo.Collection = configs.GetCollection(configs.DB, "userHairCompanies")
 var hairCompanyCollection *mongo.Collection = configs.GetCollection(configs.DB, "hairCompanies")
-
+var appointmentTypeCollection *mongo.Collection = configs.GetCollection(configs.DB, "appointmentTypes")
 //validator
 var validate = validator.New()

@@ -1,0 +1,16 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Edit Types of Appointments</h2>
+<h3><a href="/appointmentType">Back to type list</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+    <form action="{{ .rootUrl }}" method="post">
+        <h1>{{ .formTitle }}</h1>
+        <span style="color:green">{{ .successMessage }}</span>
+        <span style="color:red">{{ .errorMessage }}</span>
+        <input type="text" placeholder="Name of type" name="name" value="{{ .name }}" required/>
+        <input type="text" placeholder="Description of Type" name="description" value="{{ .description }}" required/>
+        <input type="number" placeholder="Appointment duration for this type" name="duration" value="{{ .duration }}" required/>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{{ template "footer.html" .}}

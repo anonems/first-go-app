@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
@@ -132,7 +133,7 @@ func MyCompany() gin.HandlerFunc {
 			formTitle := "Update Company"
 
 			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
-			rootUrl := "/hairCompany/edit/" + userHairCompany.ID.Hex()
+			rootUrl := "/hairCompany/edit/" + userHairCompany.HairCompanyId.Hex()
 			if err != nil {
 				formTitle = "Create Company"
 				rootUrl = "/hairCompany"
@@ -221,6 +222,90 @@ func AdminMenu() gin.HandlerFunc {
 			hairCompanyCollection.FindOne(ctx, bson.M{"_id": userHairCompany.HairCompanyId}).Decode(&hairCompany)
 			c.HTML(http.StatusOK, "adminMenu.html", gin.H{
 				"title": "Admin Portal",
+			})
+		}
+	}
+}
+
+func AppointmentTypes() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			var userHairCompany models.UserHairCompany
+			defer cancel()
+
+			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
+			if err != nil {
+				c.Redirect(http.StatusFound, "/myCompany")
+
+			}
+
+			appointmentTypeCollection.Find(ctx, bson.M{"_id": userHairCompany.HairCompanyId})
+
+			filter := bson.D{primitive.E{Key: "hairCompanyId", Value: userHairCompany.HairCompanyId}}
+
+			// Retrieves documents that match the query filer
+			cursor, err := appointmentTypeCollection.Find(context.TODO(), filter)
+			if err != nil {
+				panic(err)
+			}
+			var results []models.AppointmentType
+			if err = cursor.All(context.TODO(), &results); err != nil {
+				panic(err)
+			}
+
+			c.HTML(http.StatusOK, "typesList.html", gin.H{
+				"title": "Manage Appointment Types",
+				"types": results,
+			})
+		}
+	}
+}
+
+func EditAppointmentTypes() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			typeId := c.Param("typeId")
+			objId, _ := primitive.ObjectIDFromHex(typeId)
+			var userHairCompany models.UserHairCompany
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			var appointmentType models.AppointmentType
+			defer cancel()
+			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
+			rootUrl := "/appointmentType"
+			formTitle := "Create Type"
+			if err != nil {
+				c.Redirect(http.StatusFound, "/myCompany")
+			}
+			appointmentTypeCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&appointmentType)
+			if appointmentType.ID.Hex() == typeId {
+				rootUrl = "/appointmentType/edit/" + typeId
+				formTitle = "Update Type"
+
+			}
+			c.HTML(http.StatusOK, "editType.html", gin.H{
+				"title":          "Manage Appointment Types",
+				"rootUrl":        rootUrl,
+				"formTitle":      formTitle,
+				"name":           appointmentType.Name,
+				"description":    appointmentType.Description,
+				"duration":       appointmentType.Duration,
 			})
 		}
 	}

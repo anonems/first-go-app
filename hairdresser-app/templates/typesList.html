@@ -1,0 +1,41 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Manage Appointment</h2>
+<h3><a href="/adminMenu">Back to admin menu</a></h3>
+<h3><a href="/appointmentType/edit/0">Create new type</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+
+
+    {{ if .types }}
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .types }}
+                <tr>
+                    <th scope="row">{{ .Name }}</th>
+                    <th>{{ .Description }}</th>
+                    <th>{{ .Duration }}</th>
+                    <th><a href="/appointmentType/edit/{{ .ID.Hex }}">Edit</a> | <a href="/appointmentType/delete/{{ .ID.Hex }}">Delete</a></th>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+    {{ end }}
+
+    {{ if not .types }}
+    <div>
+        <span>No Data</span>
+    </div>
+    {{ end }}
+
+</div>
+{{ template "footer.html" .}}

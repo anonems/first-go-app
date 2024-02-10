@@ -40,7 +40,10 @@ func CreateHairCompany() gin.HandlerFunc {
 		//validate the request body
 		if err := c.BindQuery(&hairCompany); err != nil {
 			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"formTitle":    "Create Company",
+				"title":        "My Company",
 				"errorMessage": err.Error(),
+				"rootUrl": "/hairCompany",
 			})
 			return
 		}
@@ -48,8 +51,10 @@ func CreateHairCompany() gin.HandlerFunc {
 		//use the validator library to validate required fields
 		if validationErr := validate.Struct(&hairCompany); validationErr != nil {
 			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"formTitle":    "Create Company",
 				"title":        "My Company",
 				"errorMessage": validationErr.Error(),
+				"rootUrl": "/hairCompany",
 			})
 			return
 		}
@@ -64,14 +69,15 @@ func CreateHairCompany() gin.HandlerFunc {
 		result, err := hairCompanyCollection.InsertOne(ctx, newHairCompany)
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"formTitle":    "Create Company",
 				"title":        "My Company",
 				"errorMessage": err.Error(),
+				"rootUrl": "/hairCompany",
 			})
 			return
 		}
 
 		oid, _ := result.InsertedID.(primitive.ObjectID)
-
 
 		var user = &models.User{}
 		session, _ := store.Get(c.Request, "session")
@@ -85,8 +91,10 @@ func CreateHairCompany() gin.HandlerFunc {
 		_, err2 := userHairCompanyCollection.InsertOne(ctx, newUserHairCompany)
 		if err2 != nil {
 			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"formTitle":    "Create Company",
 				"title":        "My Company",
 				"errorMessage": err2.Error(),
+				"rootUrl": "/hairCompany",
 			})
 			return
 		}
@@ -133,7 +141,7 @@ func EditHairCompany() gin.HandlerFunc {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		companyId := c.Param("companyId")
 		defer cancel()
-
+		objId, _ := primitive.ObjectIDFromHex(companyId)
 		address := models.Address{
 			Line1:      c.Request.PostFormValue("line1"),
 			Line2:      c.Request.PostFormValue("line2"),
@@ -151,7 +159,10 @@ func EditHairCompany() gin.HandlerFunc {
 		//validate the request body
 		if err := c.BindQuery(&hairCompany); err != nil {
 			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"formTitle":    "Update Company",
+				"title":        "My Company",
 				"errorMessage": err.Error(),
+				"rootUrl":        "/hairCompany/edit/" + companyId,
 			})
 			return
 		}
@@ -162,26 +173,43 @@ func EditHairCompany() gin.HandlerFunc {
 			"address": hairCompany.Address,
 		}
 
-		_, err := userCollection.UpdateOne(ctx, bson.M{"id": companyId}, bson.M{"$set": update})
+		result, err := hairCompanyCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": update})
 		if err != nil {
 			c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+				"formTitle":    "Update Company",
 				"title":        "My Company",
 				"errorMessage": err.Error(),
+				"rootUrl":        "/hairCompany/edit/" + companyId,
 			})
 			return
+		}
+
+		//get updated details
+		var updatedHairCompany models.HairCompany
+		if result.MatchedCount == 1 {
+			err := hairCompanyCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&updatedHairCompany)
+			if err != nil {
+				c.HTML(http.StatusBadRequest, "myCompany.html", gin.H{
+					"formTitle":    "Update Company",
+					"title":        "My Company",
+					"errorMessage": err.Error(),
+					"rootUrl":        "/hairCompany/edit/" + companyId,
+				})
+				return
+			}
 		}
 
 		c.HTML(http.StatusOK, "myCompany.html", gin.H{
 			"title":          "My Company",
 			"rootUrl":        "/hairCompany/edit/" + companyId,
 			"formTitle":      "Update Company",
-			"name":           hairCompany.Name,
-			"siren":          hairCompany.SIREN,
-			"line1":          hairCompany.Address.Line1,
-			"line2":          hairCompany.Address.Line2,
-			"postalCode":     hairCompany.Address.PostalCode,
-			"city":           hairCompany.Address.City,
-			"country":        hairCompany.Address.Country,
+			"name":           updatedHairCompany.Name,
+			"siren":          updatedHairCompany.SIREN,
+			"line1":          updatedHairCompany.Address.Line1,
+			"line2":          updatedHairCompany.Address.Line2,
+			"postalCode":     updatedHairCompany.Address.PostalCode,
+			"city":           updatedHairCompany.Address.City,
+			"country":        updatedHairCompany.Address.Country,
 			"successMessage": "Your company has been updated!",
 		})
 
