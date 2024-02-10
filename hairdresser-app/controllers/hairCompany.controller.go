@@ -93,7 +93,7 @@ func CreateHairCompany() gin.HandlerFunc {
 
 		c.HTML(http.StatusOK, "myCompany.html", gin.H{
 			"title":          "My Company",
-			"rootUrl":        "/hairCompany/" + oid.Hex(),
+			"rootUrl":        "/hairCompany/edit/" + oid.Hex(),
 			"formTitle":      "Update Company",
 			"name":           hairCompany.Name,
 			"siren":          hairCompany.SIREN,
@@ -173,7 +173,7 @@ func EditHairCompany() gin.HandlerFunc {
 
 		c.HTML(http.StatusOK, "myCompany.html", gin.H{
 			"title":          "My Company",
-			"rootUrl":        "/hairCompany/" + companyId,
+			"rootUrl":        "/hairCompany/edit/" + companyId,
 			"formTitle":      "Update Company",
 			"name":           hairCompany.Name,
 			"siren":          hairCompany.SIREN,
