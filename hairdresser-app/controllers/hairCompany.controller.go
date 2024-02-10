@@ -173,7 +173,7 @@ func EditHairCompany() gin.HandlerFunc {
 
 		c.HTML(http.StatusOK, "myCompany.html", gin.H{
 			"title":          "My Company",
-			"rootUrl":        "/hairCompany/" + hairCompany.ID.Hex(),
+			"rootUrl":        "/hairCompany/" + companyId,
 			"formTitle":      "Update Company",
 			"name":           hairCompany.Name,
 			"siren":          hairCompany.SIREN,

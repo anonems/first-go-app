@@ -109,15 +109,6 @@ func EditUser() gin.HandlerFunc {
 			Gender:    c.Request.PostFormValue("gender"),
 		}
 		objId, _ := primitive.ObjectIDFromHex(userId)
-		// filter := bson.D{{"email", user.Email}}
-		// var checkEmail []models.User
-		// cursor, _ := userCollection.Find(context.TODO(), filter)
-		// cursor.All(context.TODO(), &checkEmail)
-		// if len(checkEmail) > 0 {
-		// 	c.JSON(http.StatusNotAcceptable, responses.DefaultResponse{Status: http.StatusInternalServerError})
-		// 	return
-		// }
-		// fmt.Println(objId)
 
 		//validate the request body
 		if err := c.BindQuery(&user); err != nil {
