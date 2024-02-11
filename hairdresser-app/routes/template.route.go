@@ -9,13 +9,15 @@ import (
 func TemplateRoute(router *gin.Engine) {
 
 	//user page
-	router.GET("/", controllers.HomePage())
-	router.GET("/menu", controllers.MainMenu())
-	router.GET("/myProfile", controllers.MyProfile())
-	router.GET("/myCompany", controllers.MyCompany())
-	router.GET("/myAppointments", controllers.MyAppointments())
-	router.GET("/adminMenu", controllers.AdminMenu())
-	router.GET("/appointmentType", controllers.AppointmentTypes())
-	router.GET("/appointmentType/edit/:typeId", controllers.EditAppointmentTypes())
+	router.GET("/", controllers.HomePageTemplate())
+	router.GET("/menu", controllers.MainMenuTemplate())
+	router.GET("/myProfile", controllers.MyProfileTemplate())
+	router.GET("/myCompany", controllers.MyCompanyTemplate())
+	router.GET("/myAppointments", controllers.MyAppointmentsTemplate())
+	router.GET("/adminMenu", controllers.AdminMenuTemplate())
+	router.GET("/appointmentType", controllers.AppointmentTypesTemplate())
+	router.GET("/appointmentType/edit/:typeId", controllers.EditAppointmentTypesTemplate())
+	router.GET("/hairdresser", controllers.HairdresserTemplate())
+	router.GET("/hairdresser/edit/:hairdresserId", controllers.EditHairdresserTemplate())
 
 }

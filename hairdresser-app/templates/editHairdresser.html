@@ -1,0 +1,15 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Edit Hairdresser</h2>
+<h3><a href="/hairdresser">Back to hairdresser list</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+    <form action="{{ .rootUrl }}" method="post">
+        <h1>{{ .formTitle }}</h1>
+        <span style="color:green">{{ .successMessage }}</span>
+        <span style="color:red">{{ .errorMessage }}</span>
+        <input type="text" placeholder="First Name" name="firstName" value="{{ .firstName }}" required/>
+        <input type="text" placeholder="Last Name" name="lastName" value="{{ .lastName }}" required/>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{{ template "footer.html" .}}

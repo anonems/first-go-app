@@ -1,7 +1,7 @@
 {{ template "header.html" .}}
-<h2>Hairdresser App: Manage Appointment - list of type</h2>
+<h2>Hairdresser App: Manage Appointment - hairdresser list</h2>
 <h3><a href="/adminMenu">Back to admin menu</a></h3>
-<h3><a href="/appointmentType/edit/0">Create new type</a></h3>
+<h3><a href="/hairdresser/edit/0">Create new hairdresser</a></h3>
 <div class="container" id="container"
     style="  display: flex; justify-content: center; align-items: center; text-align: center;">
 
@@ -10,20 +10,18 @@
             <table>
                 <thead>
                     <tr>
-                        <th scope="col">Name</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Duration</th>
+                        <th scope="col">First Name</th>
+                        <th scope="col">Last Name</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {{ range .types }}
                     <tr>
-                        <th scope="row">{{ .Name }}</th>
-                        <th>{{ .Description }}</th>
-                        <th>{{ .Duration }}</th>
-                        <th><a href="/appointmentType/edit/{{ .ID.Hex }}">Edit</a> | <a
-                                href="/appointmentType/delete/{{ .ID.Hex }}">Delete</a></th>
+                        <th scope="row">{{ .FirstName }}</th>
+                        <th>{{ .LastName }}</th>
+                        <th><a href="/hairdresser/edit/{{ .ID.Hex }}">Edit</a> | <a
+                                href="/hairdresser/delete/{{ .ID.Hex }}">Delete</a></th>
                     </tr>
                     {{ end }}
                 </tbody>
@@ -32,7 +30,7 @@
     </div>
     <span style="color: red">
         WARNING:
-        If you delete one type, all appointments created with this type will be deleted too!
+        If you delete one hairdresser, all appointments created with this hairdresser will be deleted too!
     </span>
     {{ end }}
 

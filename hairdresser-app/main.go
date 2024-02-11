@@ -24,6 +24,7 @@ func main() {
 	routes.UserRoute(router)
 	routes.HairCompanyRoute(router)
 	routes.AppointmentTypeRoute(router)
+	routes.HairdresserRoute(router)
 
 	router.Run(":5000")
 }

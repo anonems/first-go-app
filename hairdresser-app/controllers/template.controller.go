@@ -17,7 +17,7 @@ import (
 //var userCollection *mongo.Collection = configs.GetCollection(configs.DB, "users")
 //var validate = validator.New()
 
-func HomePage() gin.HandlerFunc {
+func HomePageTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user = &models.User{}
 		session, _ := store.Get(c.Request, "session")
@@ -52,7 +52,7 @@ func HomePage() gin.HandlerFunc {
 	}
 }
 
-func HairCompaniesPage() gin.HandlerFunc {
+func HairCompaniesPageTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session, _ := store.Get(c.Request, "session")
 		var user = &models.User{}
@@ -71,7 +71,7 @@ func HairCompaniesPage() gin.HandlerFunc {
 	}
 }
 
-func MainMenu() gin.HandlerFunc {
+func MainMenuTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session, _ := store.Get(c.Request, "session")
 		var user = &models.User{}
@@ -89,7 +89,7 @@ func MainMenu() gin.HandlerFunc {
 	}
 }
 
-func MyProfile() gin.HandlerFunc {
+func MyProfileTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user = &models.User{}
 		session, _ := store.Get(c.Request, "session")
@@ -114,7 +114,7 @@ func MyProfile() gin.HandlerFunc {
 	}
 }
 
-func MyCompany() gin.HandlerFunc {
+func MyCompanyTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user = &models.User{}
 		session, _ := store.Get(c.Request, "session")
@@ -156,7 +156,7 @@ func MyCompany() gin.HandlerFunc {
 	}
 }
 
-func MyAppointments() gin.HandlerFunc {
+func MyAppointmentsTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user = &models.User{}
 		session, _ := store.Get(c.Request, "session")
@@ -198,7 +198,7 @@ func MyAppointments() gin.HandlerFunc {
 	}
 }
 
-func AdminMenu() gin.HandlerFunc {
+func AdminMenuTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user = &models.User{}
 		session, _ := store.Get(c.Request, "session")
@@ -227,7 +227,7 @@ func AdminMenu() gin.HandlerFunc {
 	}
 }
 
-func AppointmentTypes() gin.HandlerFunc {
+func AppointmentTypesTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user = &models.User{}
 		session, _ := store.Get(c.Request, "session")
@@ -270,7 +270,7 @@ func AppointmentTypes() gin.HandlerFunc {
 	}
 }
 
-func EditAppointmentTypes() gin.HandlerFunc {
+func EditAppointmentTypesTemplate() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user = &models.User{}
 		session, _ := store.Get(c.Request, "session")
@@ -281,31 +281,113 @@ func EditAppointmentTypes() gin.HandlerFunc {
 				"title": "Signin / Signup",
 			})
 		} else {
-			typeId := c.Param("typeId")
-			objId, _ := primitive.ObjectIDFromHex(typeId)
+			hairdresserId := c.Param("hairdresserId")
+			objId, _ := primitive.ObjectIDFromHex(hairdresserId)
 			var userHairCompany models.UserHairCompany
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			var appointmentType models.AppointmentType
 			defer cancel()
 			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
 			rootUrl := "/appointmentType"
-			formTitle := "Create Type"
+			formTitle := "Create Hairdresser"
 			if err != nil {
 				c.Redirect(http.StatusFound, "/myCompany")
 			}
 			appointmentTypeCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&appointmentType)
-			if appointmentType.ID.Hex() == typeId {
-				rootUrl = "/appointmentType/edit/" + typeId
-				formTitle = "Update Type"
+			if appointmentType.ID.Hex() == hairdresserId {
+				rootUrl = "/hairdresser/edit/" + hairdresserId
+				formTitle = "Update Hairdresser"
 
 			}
 			c.HTML(http.StatusOK, "editType.html", gin.H{
-				"title":          "Manage Appointment Types",
-				"rootUrl":        rootUrl,
-				"formTitle":      formTitle,
-				"name":           appointmentType.Name,
-				"description":    appointmentType.Description,
-				"duration":       appointmentType.Duration,
+				"title":     "Manage Hairdresser",
+				"rootUrl":   rootUrl,
+				"formTitle": formTitle,
+				"firstName": appointmentType.Name,
+				"lastName":  appointmentType.Description,
+			})
+		}
+	}
+}
+
+func HairdresserTemplate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			var userHairCompany models.UserHairCompany
+			defer cancel()
+
+			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
+			if err != nil {
+				c.Redirect(http.StatusFound, "/myCompany")
+
+			}
+
+			appointmentTypeCollection.Find(ctx, bson.M{"_id": userHairCompany.HairCompanyId})
+
+			filter := bson.D{primitive.E{Key: "hairCompanyId", Value: userHairCompany.HairCompanyId}}
+
+			// Retrieves documents that match the query filer
+			cursor, err := hairdresserCollection.Find(context.TODO(), filter)
+			if err != nil {
+				panic(err)
+			}
+			var results []models.Hairdresser
+			if err = cursor.All(context.TODO(), &results); err != nil {
+				panic(err)
+			}
+
+			c.HTML(http.StatusOK, "hairdresserList.html", gin.H{
+				"title": "Manage Appointment Types",
+				"types": results,
+			})
+		}
+	}
+}
+
+func EditHairdresserTemplate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			hairdresserId := c.Param("hairdresserId")
+			objId, _ := primitive.ObjectIDFromHex(hairdresserId)
+			var userHairCompany models.UserHairCompany
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			var hairdresser models.Hairdresser
+			defer cancel()
+			err := userHairCompanyCollection.FindOne(ctx, bson.M{"userId": user.ID}).Decode(&userHairCompany)
+			rootUrl := "/hairdresser"
+			formTitle := "Create Hairdresser"
+			if err != nil {
+				c.Redirect(http.StatusFound, "/myCompany")
+			}
+			hairdresserCollection.FindOne(ctx, bson.M{"_id": objId}).Decode(&hairdresser)
+			if hairdresser.ID.Hex() == hairdresserId {
+				rootUrl = "/hairdresser/edit/" + hairdresserId
+				formTitle = "Update Hairdresser"
+
+			}
+			c.HTML(http.StatusOK, "editHairdresser.html", gin.H{
+				"title":     "Manage Hairdresser",
+				"rootUrl":   rootUrl,
+				"formTitle": formTitle,
+				"firstName": hairdresser.FirstName,
+				"lastName":  hairdresser.LastName,
 			})
 		}
 	}

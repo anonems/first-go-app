@@ -75,7 +75,7 @@ func CreateAppointmentType() gin.HandlerFunc {
 			"name":           appointmentType.Name,
 			"description":    appointmentType.Description,
 			"duration":       appointmentType.Duration,
-			"successMessage": "Your company has been created!",
+			"successMessage": "Appointmnet type has been created!",
 		})
 
 	}
@@ -145,7 +145,7 @@ func EditAppointmentType() gin.HandlerFunc {
 			"name":           updatedAppointmentType.Name,
 			"description":    updatedAppointmentType.Description,
 			"duration":       updatedAppointmentType.Duration,
-			"successMessage": "Your company has been created!",
+			"successMessage": "Appointment type has been updated!",
 		})
 
 	}

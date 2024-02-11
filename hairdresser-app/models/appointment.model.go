@@ -13,4 +13,5 @@ type Appointment struct {
 	Title          string             `bson:"title,omitempty" json:"title,omitempy" validate:"required"`
 	TypeId         primitive.ObjectID `bson:"typeId,omitempty" json:"typeId,omitempy" validate:"required"`
 	SpecialOfferId primitive.ObjectID `bson:"specialOfferId,omitempty" json:"specialOfferId,omitempy"`
+	HairdresserId  primitive.ObjectID `bson:"hairdresserId,omitempty" json:"hairdresserId,omitempy"`
 }
