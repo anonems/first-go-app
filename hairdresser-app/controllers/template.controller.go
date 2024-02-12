@@ -627,3 +627,36 @@ func Hairdresser() gin.HandlerFunc {
 		}
 	}
 }
+
+func Appointment() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		fmt.Println(user)
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			typeId := c.Param("typeId")
+			hairdresserId := c.Param("hairdresserId")
+			objId, _ := primitive.ObjectIDFromHex(typeId)
+			objId2, _ := primitive.ObjectIDFromHex(hairdresserId)
+			filter := bson.D{primitive.E{Key: "typeId", Value: objId}, primitive.E{Key: "hairdresserId", Value: objId2}}
+			cursor, err := appointmentCollection.Find(context.TODO(), filter)
+			if err != nil {
+				panic(err)
+			}
+			var results []models.Appointment
+			if err = cursor.All(context.TODO(), &results); err != nil {
+				panic(err)
+			}
+			c.HTML(http.StatusOK, "publicAppointmentList.html", gin.H{
+				"title": "Choice Appointment",
+				"list":  results,
+			})
+		}
+	}
+}

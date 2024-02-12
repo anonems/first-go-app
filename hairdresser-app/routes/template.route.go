@@ -28,6 +28,6 @@ func TemplateRoute(router *gin.Engine) {
 	router.GET("public/company/:country/:city", controllers.Company())
 	router.GET("public/type/:companyId", controllers.Type())
 	router.GET("public/hairdresser/:typeId", controllers.Hairdresser())
-	// router.GET("public/appointment/:hairdresserId", controllers.Appointment())
+	router.GET("public/appointment/:typeId/:hairdresserId", controllers.Appointment())
 
 }

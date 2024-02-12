@@ -1,0 +1,42 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: list of appointment</h2>
+<h3><a href="/public/france/city">Back to city list</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+
+    {{ if .list }}
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .list }}
+                    <tr>
+                        <th scope="row">{{ .Title }}</th>
+                        <th>{{ .Date }}</th>
+                        <th>{{ .Time }}</th>
+                        <th>{{ .Status }}</th>
+                        <th><a href="/public/appointment/{{ .ID.Hex }}">Choice</a></th>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{ end }}
+
+    {{ if not .list }}
+    <div>
+        <span>No Data</span>
+    </div>
+    {{ end }}
+
+</div>
+{{ template "footer.html" .}}

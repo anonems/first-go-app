@@ -7,7 +7,7 @@
     <div style="display: grid; gap: 10px;">
         {{ range .list }}
         <div style="grid-row: 1;">
-            <form action="/public/france/city"><button>{{ .FirstName }} {{ .LastName }}</button></form>
+            <form action="/public/appointment/{{ .TypeId.Hex }}/{{ .ID.Hex }}"><button>{{ .FirstName }} {{ .LastName }}</button></form>
         </div>
         {{ end }}
     </div>
