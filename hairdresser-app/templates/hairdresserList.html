@@ -5,7 +5,7 @@
 <div class="container" id="container"
     style="  display: flex; justify-content: center; align-items: center; text-align: center;">
 
-    {{ if .types }}
+    {{ if .list }}
         <div>
             <table>
                 <thead>
@@ -16,7 +16,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {{ range .types }}
+                    {{ range .list }}
                     <tr>
                         <th scope="row">{{ .FirstName }}</th>
                         <th>{{ .LastName }}</th>
@@ -34,7 +34,7 @@
     </span>
     {{ end }}
 
-    {{ if not .types }}
+    {{ if not .list }}
     <div>
         <span>No Data</span>
     </div>

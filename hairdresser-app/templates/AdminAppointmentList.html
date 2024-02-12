@@ -1,0 +1,55 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Manage Appointment - list of appointments</h2>
+<h3><a href="/adminMenu">Back to admin menu</a></h3>
+<h3><a href="/appointment/admin/edit/0">Create new Appointment</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+
+    {{ if .list }}
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Reserved by</th>
+                        <th scope="col">Hairdresser</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .list }}
+                    <tr>
+                        <th scope="row">{{ .Title }}</th>
+                        <th>{{ .Date }}</th>
+                        <th>{{ .Time }}</th>
+                        <th><a href="/appointmentType/edit/{{ .TypeId.Hex }}">Show</a></th>
+                        {{ if eq .Status "reserved" }} 
+                        <th><a href="/hairdresser/edit/{{ .UserId.Hex }}">Show</a></th>
+                        {{ else if eq .Status "available"  }} <th>-</th> 
+                        {{ end }}
+                        <th><a href="/hairdresser/edit/{{ .HairdresserId.Hex }}">Show</a></th>
+                        <th>{{ .Price }}</th>
+                        <th>{{ .Status }}</th>
+                        <th><a href="/appointment/admin/edit/{{ .ID.Hex }}">Edit</a> | <a
+                                href="/appointment/admin/delete/{{ .ID.Hex }}">Delete</a></th>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{ end }}
+
+    {{ if not .list }}
+    <div>
+        <span>No Data</span>
+    </div>
+    {{ end }}
+
+</div>
+{{ template "footer.html" .}}

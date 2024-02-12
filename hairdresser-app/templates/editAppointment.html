@@ -1,0 +1,30 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Edit Appointment</h2>
+<h3><a href="/appointment/admin">Back to appointment list</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+    <form action="{{ .rootUrl }}" method="post">
+        <h1>{{ .formTitle }}</h1>
+        <span style="color:green">{{ .successMessage }}</span>
+        <span style="color:red">{{ .errorMessage }}</span>
+        <input type="text" placeholder="Title" name="title" value="{{ .aTitle }}" required />
+        <input type="number" placeholder="Price" name="price" value="{{ .price }}" required />
+        <input type="date" placeholder="Date" name="date" value="{{ .date }}" required />
+        <input type="time" placeholder="Time" name="time" value="{{ .time }}" required />
+        <select name="typeId">
+            <option value="{{ .typeId }}" selected>Choice type...</option>
+            {{ range .types }}
+            <option value="{{ .ID.Hex }}">{{ .Name }}</option>
+            {{ end }}
+        </select>
+        <select name="hairdresserId">
+            <option value="{{ .hairdresserId }}" selected>Choice Hairdresser...</option>
+            {{ range .hairdressers }}
+            <option value="{{ .ID.Hex }}">{{ .FirstName }} {{ .LastName }}</option>
+            {{ end }}
+        </select>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+{{ template "footer.html" .}}

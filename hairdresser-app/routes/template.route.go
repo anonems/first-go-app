@@ -19,5 +19,7 @@ func TemplateRoute(router *gin.Engine) {
 	router.GET("/appointmentType/edit/:typeId", controllers.EditAppointmentTypesTemplate())
 	router.GET("/hairdresser", controllers.HairdresserTemplate())
 	router.GET("/hairdresser/edit/:hairdresserId", controllers.EditHairdresserTemplate())
+	router.GET("/appointment/admin", controllers.AdminAppointmentList())
+	router.GET("/appointment/admin/edit/:appointmentId", controllers.EditAdminAppointment())
 
 }
