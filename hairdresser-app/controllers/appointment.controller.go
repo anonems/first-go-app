@@ -170,3 +170,32 @@ func DeleteAppointment() gin.HandlerFunc {
 		c.Redirect(http.StatusFound, "/appointment/admin")
 	}
 }
+
+func TakeAppointment() gin.HandlerFunc {
+
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		appointmentId := c.Param("appointmentId")
+		defer cancel()
+		objId, _ := primitive.ObjectIDFromHex(appointmentId)
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		fmt.Println(user)
+		user, _= val.(*models.User)
+		appointment := models.Appointment{
+			UserId: user.ID,
+			Status: constants.RESERVED,
+		}
+
+		update := bson.M{
+			"userId": appointment.UserId,
+			"status": appointment.Status,
+		}
+
+		appointmentCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": update})
+
+		c.Redirect(http.StatusFound, "/")
+
+	}
+}

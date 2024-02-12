@@ -11,5 +11,6 @@ func AppointmentRoute(router *gin.Engine) {
 	router.POST("/appointment/admin", controllers.CreateAppointment())
 	router.POST("/appointment/admin/edit/:appointmentId", controllers.EditAppointment())
 	router.GET("/appointment/admin/delete/:appointmentId", controllers.DeleteAppointment())
+	router.GET("public/appointment/take/:appointmentId", controllers.TakeAppointment())
 
 }
