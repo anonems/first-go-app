@@ -1,0 +1,23 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Choice Company</h2>
+<h3><a href="/public/france/city">Back to city list</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+    {{ if .list }}
+    <div style="display: grid; gap: 10px;">
+        {{ range .list }}
+        <div style="grid-row: 1;">
+            <form action="/public/type/{{ .ID.Hex }}"><button>{{ .Name }}</button></form>
+        </div>
+        {{ end }}
+    </div>
+    {{ end }}
+
+    {{ if not .list }}
+    <div>
+        <span>No Data</span>
+    </div>
+    {{ end }}
+
+</div>
+{{ template "footer.html" .}}

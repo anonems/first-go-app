@@ -12,8 +12,17 @@
         <input type="text" placeholder="Address : Line 1" name="line1" value="{{ .line1 }}" required/>
         <input type="text" placeholder="Address : Line 2" name="line2" value="{{ .line2 }}"/>
         <input type="text" placeholder="Address : Postal Code" name="postalCode" minlength="5" maxlength="5" value="{{ .postalCode }}" required/>
-        <input type="text" placeholder="Address : City" name="city" value="{{ .city }}" required/>
-        <input type="text" placeholder="Address : Country" name="country" value="{{ .country }}" required/>
+        <select name="city" required>
+            <option value="{{ .city }}" selected>Choice city...</option>
+            <option value="paris" >Paris</option>
+            <option value="nice" >Nice</option>
+            <option value="marseille" >Marseille</option>
+            <option value="lyon" >Lyon</option>
+        </select>
+        <select name="country" required>
+            <option value="{{ .country }}" selected>Choice country...</option>
+            <option value="france">France</option>
+        </select>
         <button type="submit">Submit</button>
     </form>
 </div>

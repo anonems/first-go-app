@@ -12,6 +12,7 @@
                     <tr>
                         <th scope="col">First Name</th>
                         <th scope="col">Last Name</th>
+                        <th scope="col">Type</th>
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
@@ -20,6 +21,7 @@
                     <tr>
                         <th scope="row">{{ .FirstName }}</th>
                         <th>{{ .LastName }}</th>
+                        <th><a href="/hairdresser/edit/{{ .TypeId.Hex }}">{{ .TypeId.Hex }}</a></th>
                         <th><a href="/hairdresser/edit/{{ .ID.Hex }}">Edit</a> | <a
                                 href="/hairdresser/delete/{{ .ID.Hex }}">Delete</a></th>
                     </tr>

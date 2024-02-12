@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"context"
-	"hairdresser-app/models"
-	"net/http"
-	"time"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"hairdresser-app/models"
+	"net/http"
+	"time"
 )
 
 //var validate = validator.New()
@@ -16,10 +16,13 @@ func CreateHairdresser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
+		typeId := c.Request.PostFormValue("typeId")
+		objId, _ := primitive.ObjectIDFromHex(typeId)
 
 		hairdresser := models.Hairdresser{
 			FirstName: c.Request.PostFormValue("firstName"),
 			LastName:  c.Request.PostFormValue("lastName"),
+			TypeId:    objId,
 		}
 
 		//validate the request body
@@ -48,6 +51,7 @@ func CreateHairdresser() gin.HandlerFunc {
 			FirstName:     hairdresser.FirstName,
 			LastName:      hairdresser.LastName,
 			HairCompanyId: userHairCompany.HairCompanyId,
+			TypeId:        hairdresser.TypeId,
 		}
 
 		result, err := hairdresserCollection.InsertOne(ctx, newAppointmentType)
@@ -63,6 +67,16 @@ func CreateHairdresser() gin.HandlerFunc {
 
 		oid, _ := result.InsertedID.(primitive.ObjectID)
 
+		filter := bson.D{primitive.E{Key: "hairCompanyId", Value: oid}}
+		cursor, err := appointmentTypeCollection.Find(context.TODO(), filter)
+		if err != nil {
+			panic(err)
+		}
+		var results []models.AppointmentType
+		if err = cursor.All(context.TODO(), &results); err != nil {
+			panic(err)
+		}
+
 		c.HTML(http.StatusOK, "editHairdresser.html", gin.H{
 			"title":          "Manage Hairdresser",
 			"rootUrl":        "/hairdresser/edit/" + oid.Hex(),
@@ -70,6 +84,8 @@ func CreateHairdresser() gin.HandlerFunc {
 			"firstName":      hairdresser.FirstName,
 			"lastName":       hairdresser.LastName,
 			"successMessage": "Hairdresser has been created!",
+			"list":           results,
+			"typeId":         hairdresser.TypeId.Hex(),
 		})
 
 	}
@@ -83,9 +99,13 @@ func EditHairdresser() gin.HandlerFunc {
 		defer cancel()
 		objId, _ := primitive.ObjectIDFromHex(hairdresserId)
 
+		typeId := c.Request.PostFormValue("typeId")
+		objId2, _ := primitive.ObjectIDFromHex(typeId)
+
 		hairdresser := models.Hairdresser{
 			FirstName: c.Request.PostFormValue("firstName"),
 			LastName:  c.Request.PostFormValue("lastName"),
+			TypeId:    objId2,
 		}
 
 		//validate the request body
@@ -101,6 +121,7 @@ func EditHairdresser() gin.HandlerFunc {
 		update := bson.M{
 			"firstName": hairdresser.FirstName,
 			"lastName":  hairdresser.LastName,
+			"typeId":    hairdresser.TypeId,
 		}
 
 		result, err := hairdresserCollection.UpdateOne(ctx, bson.M{"_id": objId}, bson.M{"$set": update})
@@ -129,6 +150,16 @@ func EditHairdresser() gin.HandlerFunc {
 			}
 		}
 
+		filter := bson.D{primitive.E{Key: "hairCompanyId", Value: updatedHairdresser.HairCompanyId}}
+		cursor, err := appointmentTypeCollection.Find(context.TODO(), filter)
+		if err != nil {
+			panic(err)
+		}
+		var results []models.AppointmentType
+		if err = cursor.All(context.TODO(), &results); err != nil {
+			panic(err)
+		}
+
 		c.HTML(http.StatusOK, "editHairdresser.html", gin.H{
 			"title":          "Manage Appointment Types",
 			"rootUrl":        "/hairdresser/edit/" + hairdresserId,
@@ -136,6 +167,8 @@ func EditHairdresser() gin.HandlerFunc {
 			"firstName":      updatedHairdresser.FirstName,
 			"lastName":       updatedHairdresser.LastName,
 			"successMessage": "Hairdresser has been updated!",
+			"list":           results,
+			"typeId":         hairdresser.TypeId.Hex(),
 		})
 
 	}

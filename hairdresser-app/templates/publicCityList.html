@@ -1,0 +1,13 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Choice city</h2>
+<h3><a href="/public/country">Back to country list</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+    <div style="display: grid; gap: 10px;">
+        <div style="grid-row: 1;"><form action="/public/company/france/paris"><button>Paris</button></form></div>
+        <div style="grid-row: 2;"><form action="/public/company/france/nice"><button>Nice</button></form></div>
+        <div style="grid-row: 3;"><form action="/public/company/france/marseille"><button>Marseille</button></form></div>
+        <div style="grid-row: 4;"><form action="/public/company/france/lyon"><button>Lyon</button></form></div>
+    </div>
+</div>
+{{ template "footer.html" .}}

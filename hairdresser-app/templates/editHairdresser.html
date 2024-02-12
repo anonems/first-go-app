@@ -9,6 +9,12 @@
         <span style="color:red">{{ .errorMessage }}</span>
         <input type="text" placeholder="First Name" name="firstName" value="{{ .firstName }}" required/>
         <input type="text" placeholder="Last Name" name="lastName" value="{{ .lastName }}" required/>
+        <select name="typeId">
+            <option value="{{ .typeId }}" selected>Choice Type...</option>
+            {{ range .list }}
+            <option value="{{ .ID.Hex }}">{{ .Name }}</option>
+            {{ end }}
+        </select>
         <button type="submit">Submit</button>
     </form>
 </div>

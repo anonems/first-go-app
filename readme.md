@@ -49,8 +49,10 @@ Perspectives futures :
     -Permettre de payer en ligne sont rendez-vous (à travers les apis stripe)
     -Permettre de retouver les reçus/factures des rendez vous passés
     -Permettre d'ajouter plusieurs administrateurs et gérer leurs rôles (architecture actuelle pensée pour cette fonctionnalité)
-    -Améliorer l'UI :)
+    -Améliorer l'UI 
     -Permettre l'accès à la liste de rendez-vous sans connexion
+    -Ouvrir l'application à d'autres pays
+    -Ouvrir l'application à d'autre villes
 
 Durée du processus de développement : 3 / 4 jours
 

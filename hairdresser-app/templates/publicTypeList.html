@@ -1,0 +1,40 @@
+{{ template "header.html" .}}
+<h2>Hairdresser App: Manage Appointment - list of type</h2>
+<h3><a href="/public/france/city">Back to city list</a></h3>
+<div class="container" id="container"
+    style="  display: flex; justify-content: center; align-items: center; text-align: center;">
+
+    {{ if .list }}
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Duration</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ range .list }}
+                    <tr>
+                        <th scope="row">{{ .Name }}</th>
+                        <th>{{ .Description }}</th>
+                        <th>{{ .Duration }}</th>
+                        <th><a href="/public/hairdresser/{{ .ID.Hex }}">Choice</a></th>
+                    </tr>
+                    {{ end }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{ end }}
+
+    {{ if not .list }}
+    <div>
+        <span>No Data</span>
+    </div>
+    {{ end }}
+
+</div>
+{{ template "footer.html" .}}

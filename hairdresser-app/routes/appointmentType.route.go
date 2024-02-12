@@ -2,7 +2,6 @@ package routes
 
 import (
 	"hairdresser-app/controllers"
-
 	"github.com/gin-gonic/gin"
 )
 

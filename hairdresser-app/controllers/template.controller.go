@@ -285,12 +285,12 @@ func EditAppointmentTypesTemplate() gin.HandlerFunc {
 
 			}
 			c.HTML(http.StatusOK, "editType.html", gin.H{
-				"title":     "Manage Hairdresser",
-				"rootUrl":   rootUrl,
-				"formTitle": formTitle,
-				"name": appointmentType.Name,
-				"description":  appointmentType.Description,
-				"duration":  appointmentType.Duration,
+				"title":       "Manage Hairdresser",
+				"rootUrl":     rootUrl,
+				"formTitle":   formTitle,
+				"name":        appointmentType.Name,
+				"description": appointmentType.Description,
+				"duration":    appointmentType.Duration,
 			})
 		}
 	}
@@ -330,7 +330,7 @@ func HairdresserTemplate() gin.HandlerFunc {
 			}
 
 			c.HTML(http.StatusOK, "hairdresserList.html", gin.H{
-				"title": "Manage Appointment Types",
+				"title": "Manage Hairdresser Types",
 				"list":  results,
 			})
 		}
@@ -366,12 +366,24 @@ func EditHairdresserTemplate() gin.HandlerFunc {
 				formTitle = "Update Hairdresser"
 
 			}
+
+			filter := bson.D{primitive.E{Key: "hairCompanyId", Value: userHairCompany.HairCompanyId}}
+			cursor, err := appointmentTypeCollection.Find(context.TODO(), filter)
+			if err != nil {
+				panic(err)
+			}
+			var results []models.AppointmentType
+			if err = cursor.All(context.TODO(), &results); err != nil {
+				panic(err)
+			}
 			c.HTML(http.StatusOK, "editHairdresser.html", gin.H{
 				"title":     "Manage Hairdresser",
 				"rootUrl":   rootUrl,
 				"formTitle": formTitle,
 				"firstName": hairdresser.FirstName,
 				"lastName":  hairdresser.LastName,
+				"typeId":    hairdresser.TypeId,
+				"list": results,
 			})
 		}
 	}
@@ -408,7 +420,7 @@ func AdminAppointmentList() gin.HandlerFunc {
 			var results []models.Appointment
 			if err = cursor.All(context.TODO(), &results); err != nil {
 				panic(err)
-			} 
+			}
 
 			c.HTML(http.StatusOK, "AdminAppointmentList.html", gin.H{
 				"title": "Manage Appointments",
@@ -481,6 +493,136 @@ func EditAdminAppointment() gin.HandlerFunc {
 				"hairdresserId": appointment.HairdresserId,
 				"types":         types,
 				"hairdressers":  hairdressers,
+			})
+		}
+	}
+}
+
+func Country() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		fmt.Println(user)
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			c.HTML(http.StatusOK, "publicCountryList.html", gin.H{
+				"title": "Choice Country",
+			})
+		}
+	}
+}
+
+func City() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		fmt.Println(user)
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			c.HTML(http.StatusOK, "publicCityList.html", gin.H{
+				"title": "Choice City",
+			})
+		}
+	}
+}
+
+func Company() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		fmt.Println(user)
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			city := c.Param("city")
+			filter := bson.D{primitive.E{Key: "address.city", Value: city}}
+			cursor, err := hairCompanyCollection.Find(context.TODO(), filter)
+			if err != nil {
+				panic(err)
+			}
+			var results []models.HairCompany
+			if err = cursor.All(context.TODO(), &results); err != nil {
+				panic(err)
+			}
+			c.HTML(http.StatusOK, "publicCompanyList.html", gin.H{
+				"title": "Choice Company",
+				"list":  results,
+			})
+		}
+	}
+}
+
+func Type() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		fmt.Println(user)
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			companyId := c.Param("companyId")
+			objId, _ := primitive.ObjectIDFromHex(companyId)
+			filter := bson.D{primitive.E{Key: "hairCompanyId", Value: objId}}
+			cursor, err := appointmentTypeCollection.Find(context.TODO(), filter)
+			if err != nil {
+				panic(err)
+			}
+			var results []models.AppointmentType
+			if err = cursor.All(context.TODO(), &results); err != nil {
+				panic(err)
+			}
+			c.HTML(http.StatusOK, "publicTypeList.html", gin.H{
+				"title": "Choice Type",
+				"list":  results,
+			})
+		}
+	}
+}
+
+func Hairdresser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var user = &models.User{}
+		session, _ := store.Get(c.Request, "session")
+		val := session.Values["user"]
+		var ok bool
+		fmt.Println(user)
+		if user, ok = val.(*models.User); !ok {
+			c.HTML(http.StatusOK, "index.html", gin.H{
+				"title": "Signin / Signup",
+			})
+		} else {
+			typeId := c.Param("typeId")
+			objId, _ := primitive.ObjectIDFromHex(typeId)
+			filter := bson.D{primitive.E{Key: "typeId", Value: objId}}
+			cursor, err := hairdresserCollection.Find(context.TODO(), filter)
+			if err != nil {
+				panic(err)
+			}
+			var results []models.Hairdresser
+			if err = cursor.All(context.TODO(), &results); err != nil {
+				panic(err)
+			}
+			c.HTML(http.StatusOK, "publicHairdresserList.html", gin.H{
+				"title": "Choice Hairdresser",
+				"list":  results,
 			})
 		}
 	}
